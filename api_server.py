@@ -38,4 +38,7 @@ class ApiCollect:
             with open(f"{folder}/{filename}", "wb") as f:
                 f.write(r.content)
 
+            # Extract all files
+            with zipfile.ZipFile(f"{folder}/{filename}") as myzip:
+                myzip.extractall(f"{folder}/extracted")
 
