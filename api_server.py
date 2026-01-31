@@ -13,8 +13,8 @@ class ApiCollect:
         self.url = url
         self.file_list = []
 
-    # Function to download and extract files
-    def download_file(self, folder="downloads"):
+    # Function to download files
+    def download_file_zip(self, folder="downloads"):
         url = self.url
         # Collecting the requests
         response = requests.get(url, stream=True)# 'stream=True': split the data to not fulling memory
@@ -37,7 +37,13 @@ class ApiCollect:
             # Open and downloading the file by file name in file_list
             with open(f"{folder}/{filename}", "wb") as f:
                 f.write(r.content)
+        # Return the files name in a list
+        return self.file_list
 
+    # # Function to extract files
+    def extract_files(self, file_list, folder='downloads'):
+        file_list = file_list
+        for filename in file_list:
             # Extract all files
             with zipfile.ZipFile(f"{folder}/{filename}") as myzip:
                 myzip.extractall(f"{folder}/extracted")
