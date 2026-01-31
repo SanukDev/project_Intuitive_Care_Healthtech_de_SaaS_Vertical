@@ -1,6 +1,7 @@
 from api_server import ApiCollect
 from pathlib import Path
 import pandas as pd
+from zipfile import PyZipFile
 
 URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
 
@@ -32,11 +33,18 @@ site = Path('downloads/extracted/')
 #-------------------------------- CHUNKING
 chunks = []
 dfs_list = []
-for file in site.iterdir():
-    print(file)
-    for chunk in pd.read_csv(f'{file}',sep=None, engine='python', chunksize=500):
+
+def chunking_func(file):
+    file = file
+    for chunk in pd.read_csv(f'{file}', sep=None, engine='python', chunksize=500):
         chunks.append(chunk)
     df = pd.concat(chunks)
+
+    return df
+
+for file in site.iterdir():
+    print(file)
+    df = chunking_func(file=file)
 
     print(df.shape)
     result = df[df['DESCRICAO'].str.contains("Despesas com")]
@@ -49,3 +57,6 @@ df_conso = pd.concat(dfs_list)
 print(df_conso.shape)
 print(df_conso['DESCRICAO'].head())
 df_conso.to_csv('df_cons.csv')
+
+with PyZipFile('df_cons.csv','r') as myzip:
+    myzip.writepy('df_zip/')
