@@ -12,7 +12,7 @@ class ApiCollect:
     def __init__(self, url):
         self.url = url
         self.file_list = []
-
+    # 1.1. Acesso à API de Dados Abertos da ANS
     # Function to download files
     def download_file_zip(self, folder="downloads"):
         url = self.url
@@ -40,8 +40,11 @@ class ApiCollect:
         # Return the files name in a list
         return self.file_list
 
-    # # Function to extract files
+    # 1.2. Processamento de Arquivos
+    # Function to extract files
     def extract_files(self, file_list, folder='downloads'):
+        """This function extract the files and put in folder called extracted. Receive variable like file_list = [] type
+         list receive a list with names of files, folder='download' type str that contain name of folder where the file is"""
         file_list = file_list
         for filename in file_list:
             # Extract all files

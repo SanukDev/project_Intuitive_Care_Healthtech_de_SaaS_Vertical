@@ -5,9 +5,9 @@ from zipfile import PyZipFile
 
 URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
 
-
 data_api = ApiCollect(url=URL)
 files_name = data_api.download_file_zip()
+
 # files_name = ['1T2025.zip']
 # The file names must be passed in a list
 data_api.extract_files(files_name)
@@ -33,24 +33,28 @@ site = Path('downloads/extracted/')
 #-------------------------------- CHUNKING
 chunks = []
 dfs_list = []
-
+# Trade-off tecnico
 def chunking_func(file):
+    """This function split the data process in 500 line by turn and return the data frame"""
     file = file
     for chunk in pd.read_csv(f'{file}', sep=None, engine='python', chunksize=500):
+    # the "sep=" allows to choice a separator between ';', ',' and others, and engine='python', is bear that C language than python,
+    # therefore this function allows other file extension like txt, cdv and xlsx
         chunks.append(chunk)
     df = pd.concat(chunks)
-
     return df
 
-for file in site.iterdir():
-    print(file)
-    df = chunking_func(file=file)
 
-    print(df.shape)
+# 1.2. Processamento de Arquivos
+for file in site.iterdir():
+    print(f'Processing the file: {file}')
+    df = chunking_func(file=file)
+    print(f'Size of dataFrame: {df.shape}')
+    # search data
     result = df[df['DESCRICAO'].str.contains("Despesas com")]
+    print(f'size the dataFrame after search is: {result.shape}')
     dfs_list.append(result)
-    print(result.shape)
-    print(result.head())
+
 
 df_conso = pd.concat(dfs_list)
 
