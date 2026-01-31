@@ -26,7 +26,7 @@ class ApiCollect:
         self.file_list = []
         # Collecting the file names by html file
         for a in soup.find_all('a'):
-            if a["href"].endswith('.zip'):
+            if a["href"].endswith('.zip') or a["href"].endswith('.csv'):
                 self.file_list.append(a.text)
         # Creating repository
         os.makedirs(folder, exist_ok=True)

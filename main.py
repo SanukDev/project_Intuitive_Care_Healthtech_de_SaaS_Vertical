@@ -1,7 +1,7 @@
 from api_server import ApiCollect
 from pathlib import Path
 import pandas as pd
-from zipfile import PyZipFile
+from zipfile import ZipFile
 
 URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
 
@@ -44,23 +44,49 @@ def chunking_func(file):
     df = pd.concat(chunks)
     return df
 
+file_end_name = "consolidado_despesas.csv"
+df_consolidado = []
+# To try open the file consolidado_despesas.csv, but case not exist jump it to the routine to create it
+try:
+    df_consolidado = chunking_func(file=file_end_name)
 
-# 1.2. Processamento de Arquivos
-for file in site.iterdir():
-    print(f'Processing the file: {file}')
-    df = chunking_func(file=file)
-    print(f'Size of dataFrame: {df.shape}')
-    # search data
-    result = df[df['DESCRICAO'].str.contains("Despesas com")]
-    print(f'size the dataFrame after search is: {result.shape}')
-    dfs_list.append(result)
+except:
+    # 1.2. Processamento de Arquivos
+    for file in site.iterdir():
+        print(f'Processing the file: {file}\n')
+        df = chunking_func(file=file)
+        print(f'Size of dataFrame: {df.shape}\n')
+        # search data
+        result = df[df['DESCRICAO'].str.contains("Despesas com")]
+        print(f'size the dataFrame after search is: {result.shape}\n')
+
+        #Checking if there are NaN values
+        print('There is bad rows in dataFrame?: ')
+        print(result.isna().sum())
+
+        # Checking if there are duplicated values
+        print(f'\nThere are duplicated values?: {result.duplicated().sum()}\n')
+        # If there are bad data, the '.dropna()' method will delete it
+        result = result.dropna()
+
+        # Printing information of dataFrame with 'info()' method
+        print('\nInformation of data: ')
+        print(result.info())
+
+        dfs_list.append(result)
+    df_consolidado = pd.concat(dfs_list)
+    # ------------------------- Checking the final data
 
 
-df_conso = pd.concat(dfs_list)
+print(df_consolidado.shape)
+df_consolidado['DATA'] = pd.to_datetime(df_consolidado['DATA'])
+print(df_consolidado['DESCRICAO'].head())
+print('\n')
+print(df_consolidado['CD_CONTA_CONTABIL'].duplicated().sum())
 
-print(df_conso.shape)
-print(df_conso['DESCRICAO'].head())
-df_conso.to_csv('df_cons.csv')
-
-with PyZipFile('df_cons.csv','r') as myzip:
-    myzip.writepy('df_zip/')
+print(df_consolidado.describe())
+print(df_consolidado.info())
+df_consolidado.to_csv(file_end_name)
+#
+# with ZipFile('consolidado_despesas.zip','w') as my_zip:
+#     my_zip.write(f'{file_end_name}')
