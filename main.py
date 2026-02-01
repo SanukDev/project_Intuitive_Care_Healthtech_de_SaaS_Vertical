@@ -8,12 +8,13 @@ URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
 data_api = ApiCollect(url=URL)
 files_name = data_api.download_file_zip()
 
-# files_name = ['1T2025.zip']
-# The file names must be passed in a list
-data_api.extract_files(files_name)
-
 # Creating DataProcess object
 data_proc = DataProcess()
+# files_name = ['1T2025.zip']
+# The file names must be passed in a list
+data_proc.extract_files(files_name)
+
+
 # This line allows read .csv .xlsx and .txt files with same structure
 # df = pandas.read_csv('downloads/extracted/1T2025.csv',sep=None, engine='python') # the "sep=" allows to choice a separator between ';', ',' and others
 
@@ -32,7 +33,7 @@ site = Path('downloads/extracted/')
 #     print(result.head())
 
 
-#-------------------------------- CHUNKING
+
 dfs_list = []
 file_end_name = "consolidado_despesas.csv"
 df_consolidado = []
@@ -44,10 +45,16 @@ except:
     # 1.2. Processamento de Arquivos
     for file in site.iterdir():
         print(f'Processing the file: {file}\n')
-        df = data_proc.chunking_func(file=file)
-        print(f'Size of dataFrame: {df.shape}\n')
+        # -------------------------------- CHUNKING-----------------------------------
+        chunks = []
+        for chunk in pd.read_csv(f'{file}', sep=None, engine='python', chunksize=500):
+            # the "sep=" allows to choice a separator between ';', ',' and others, engine='python' allows automatic delimiter detection, but is slower than the C engine,
+            # therefore this function allows other file extension like txt, csv and xlsx
+            chunks.append(chunk[chunk['DESCRICAO'].str.contains("Despesas com")])
+        df = pd.concat(chunks)
+
         # search data
-        result = df[df['DESCRICAO'].str.contains("Despesas com")]
+        result = df
         print(f'size the dataFrame after search is: {result.shape}\n')
 
         #Checking if there are NaN values
@@ -81,3 +88,7 @@ try:
     data_proc.to_zip(file_name=file_end_name, name_zip='consolidado_despesas')
 except FileExistsError:
    print("\nThe file already exist...\n")
+
+
+df_consolidado['VL_SALDO_INICIAL'] = df_consolidado['VL_SALDO_INICIAL'].to_numpy()
+print(df_consolidado.info())

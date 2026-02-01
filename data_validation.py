@@ -9,6 +9,27 @@ data_collect.download_file_zip()
 
 data_proc = DataProcess()
 df_relatorio = data_proc.chunking_func(file='downloads/Relatorio_cadop.csv')
-
+df_conso = data_proc.chunking_func(file='consolidado_despesas.csv')
+print('The size of data frame: ')
 print(df_relatorio.shape)
 
+# start data verification
+print('\nInformation of data frame: \n')
+print(df_relatorio.info())
+
+print(f'There are NaN values? ')
+print(df_relatorio.isna().sum())
+
+print(f'There are duplicated values? {df_relatorio.duplicated().sum()}')
+# df_relatorio = df_relatorio.dropna()
+print(df_relatorio['DDD'])
+# the most important data are correct and complete therefore I will keep the NaN values
+
+# ------------------------------- merger the data
+
+df_final = df_relatorio.merge(df_conso, left_on=['REGISTRO_OPERADORA'], right_on=['REG_ANS'], how='left')
+
+print(df_final.head())
+print(df_final.info())
+print(df_final.duplicated().sum())
+print(df_final.isna().sum())
