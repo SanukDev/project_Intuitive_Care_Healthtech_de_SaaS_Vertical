@@ -1,5 +1,5 @@
 from api_server import ApiCollect
-from main import chunking_func
+from data_process import DataProcess
 import pandas as pd
 
 URL = 'https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/'
@@ -7,7 +7,8 @@ URL = 'https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativ
 data_collect = ApiCollect(url=URL)
 data_collect.download_file_zip()
 
-df_relatorio = chunking_func(file='downloads/Relatorio_cadop.csv')
+data_proc = DataProcess()
+df_relatorio = data_proc.chunking_func(file='downloads/Relatorio_cadop.csv')
 
 print(df_relatorio.shape)
 
