@@ -44,6 +44,12 @@ def chunking_func(file):
     df = pd.concat(chunks)
     return df
 
+def to_zip(file_name, name_zip='compacted'):
+    with ZipFile(f'{name_zip}.zip','w') as my_zip:
+        my_zip.write(f'{file_name}')
+
+
+
 file_end_name = "consolidado_despesas.csv"
 df_consolidado = []
 # To try open the file consolidado_despesas.csv, but case not exist jump it to the routine to create it
@@ -87,6 +93,5 @@ print(df_consolidado['CD_CONTA_CONTABIL'].duplicated().sum())
 print(df_consolidado.describe())
 print(df_consolidado.info())
 df_consolidado.to_csv(file_end_name)
-#
-# with ZipFile('consolidado_despesas.zip','w') as my_zip:
-#     my_zip.write(f'{file_end_name}')
+
+to_zip(file_name=file_end_name, name_zip='consolidado_despesas')
