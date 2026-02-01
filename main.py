@@ -92,6 +92,8 @@ print(df_consolidado['CD_CONTA_CONTABIL'].duplicated().sum())
 
 print(df_consolidado.describe())
 print(df_consolidado.info())
-df_consolidado.to_csv(file_end_name)
-
-to_zip(file_name=file_end_name, name_zip='consolidado_despesas')
+try:
+    df_consolidado.to_csv(file_end_name, mode='x' )
+    to_zip(file_name=file_end_name, name_zip='consolidado_despesas')
+except FileExistsError:
+   print("\nThe file already exist...\n")

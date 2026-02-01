@@ -1,9 +1,13 @@
 from api_server import ApiCollect
-from main import chunking_func, to_zip
+from main import chunking_func
 import pandas as pd
 
 URL = 'https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/'
 
-data_validation = ApiCollect(url=URL)
-data_validation.download_file_zip()
+data_collect = ApiCollect(url=URL)
+data_collect.download_file_zip()
+
+df_relatorio = chunking_func(file='downloads/Relatorio_cadop.csv')
+
+print(df_relatorio.shape)
 
