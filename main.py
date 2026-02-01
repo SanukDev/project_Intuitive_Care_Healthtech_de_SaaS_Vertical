@@ -50,7 +50,7 @@ except:
         for chunk in pd.read_csv(f'{file}', sep=None, engine='python', chunksize=500):
             # the "sep=" allows to choice a separator between ';', ',' and others, engine='python' allows automatic delimiter detection, but is slower than the C engine,
             # therefore this function allows other file extension like txt, csv and xlsx
-            chunks.append(chunk[chunk['DESCRICAO'].str.contains("Despesas com")])
+            chunks.append(chunk[chunk['DESCRICAO'].str.contains("Despesas com Eventos/Sinistros")])
         df = pd.concat(chunks)
 
         # search data

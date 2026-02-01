@@ -20,16 +20,20 @@ print(df_relatorio.info())
 print(f'There are NaN values? ')
 print(df_relatorio.isna().sum())
 
-print(f'There are duplicated values? {df_relatorio.duplicated().sum()}')
+print(f'\nThere are duplicated values? {df_relatorio.duplicated().sum()}\n')
 # df_relatorio = df_relatorio.dropna()
-print(df_relatorio['DDD'])
 # the most important data are correct and complete therefore I will keep the NaN values
 
 # ------------------------------- merger the data
 
 df_final = df_relatorio.merge(df_conso, left_on=['REGISTRO_OPERADORA'], right_on=['REG_ANS'], how='left')
 
-print(df_final.head())
+#
+print(df_final.shape)
 print(df_final.info())
-print(df_final.duplicated().sum())
 print(df_final.isna().sum())
+
+#-------------------- Clean duplicated data in the Dataframe
+df_final = df_final.drop(df_final[df_final['CNPJ'].duplicated()].index)
+print(df_final['Razao_Social'].tail(50))
+print(df_final.shape)
