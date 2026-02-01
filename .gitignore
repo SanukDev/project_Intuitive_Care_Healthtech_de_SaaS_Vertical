@@ -3,5 +3,5 @@
 .idea
 .DS_Store
 __pycache__
-downloads/extracted/*
+downloads/*
 consolidado_despesas.csv
