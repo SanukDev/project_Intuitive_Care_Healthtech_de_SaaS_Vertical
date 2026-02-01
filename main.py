@@ -43,6 +43,7 @@ try:
 
 except:
     # 1.2. Processamento de Arquivos
+    trimestre =  1
     for file in site.iterdir():
         print(f'Processing the file: {file}\n')
         # -------------------------------- CHUNKING-----------------------------------
@@ -51,10 +52,8 @@ except:
             # the "sep=" allows to choice a separator between ';', ',' and others, engine='python' allows automatic delimiter detection, but is slower than the C engine,
             # therefore this function allows other file extension like txt, csv and xlsx
             chunks.append(chunk[chunk['DESCRICAO'].str.contains("Despesas com Eventos/Sinistros")])
-        df = pd.concat(chunks)
+        result = pd.concat(chunks)
 
-        # search data
-        result = df
         print(f'size the dataFrame after search is: {result.shape}\n')
 
         #Checking if there are NaN values
