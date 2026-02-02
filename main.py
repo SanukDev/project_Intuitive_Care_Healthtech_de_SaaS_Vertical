@@ -5,8 +5,8 @@ from data_process import DataProcess
 
 URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
 
-data_api = ApiCollect(url=URL)
-files_name = data_api.download_file_zip()
+data_collect = ApiCollect(url=URL)
+files_name = data_collect.download_file_zip()
 
 # Creating DataProcess object
 data_proc = DataProcess()
@@ -45,7 +45,7 @@ except:
     # 1.2. Processamento de Arquivos
     trimestre =  1
     for file in site.iterdir():
-        print(f'Processing the file: {file}\n')
+        print(f'Processing the file: {file}...\n')
         # -------------------------------- CHUNKING-----------------------------------
         chunks = []
         for chunk in pd.read_csv(f'{file}', sep=None, engine='python', chunksize=500):
@@ -88,6 +88,3 @@ try:
 except FileExistsError:
    print("\nThe file already exist...\n")
 
-
-df_consolidado['VL_SALDO_INICIAL'] = df_consolidado['VL_SALDO_INICIAL'].to_numpy()
-print(df_consolidado.info())

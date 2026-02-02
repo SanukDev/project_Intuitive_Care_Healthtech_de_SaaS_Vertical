@@ -1,15 +1,15 @@
 from api_server import ApiCollect
 from data_process import DataProcess
 import pandas as pd
-import matplotlib.pyplot as plt
 
-URL = 'https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/'
-
-data_collect = ApiCollect(url=URL)
-data_collect.download_file_zip()
-
+data_collect = ApiCollect(url='https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/')
 data_proc = DataProcess()
-df_relatorio = data_proc.chunking_func(file='downloads/Relatorio_cadop.csv')
+try:
+    df_relatorio = data_proc.chunking_func(file='downloads/Relatorio_cadop.csv')
+except:
+    data_collect.download_file_zip()
+    df_relatorio = data_proc.chunking_func(file='downloads/Relatorio_cadop.csv')
+
 df_conso = data_proc.chunking_func(file='consolidado_despesas.csv')
 print('Verification Relatorio cadop\n')
 print('The size of data frame Relatorio cadop: ')
