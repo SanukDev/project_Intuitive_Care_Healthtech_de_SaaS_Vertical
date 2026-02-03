@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, jsonify
-from data_process import DataProcess
+from src.data_process import DataProcess
 from flask_cors import CORS
-import pandas as pd
 
 app = Flask(__name__)
 CORS(app)

@@ -1,8 +1,8 @@
-from api_collect import ApiCollect
+from src.api_collect import ApiCollect
 from pathlib import Path
 import pandas as pd
 import os
-from data_process import DataProcess
+from src.data_process import DataProcess
 
 
 URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
@@ -230,7 +230,7 @@ df_valor_by_trimestre.to_csv(f'{folder_final_data}/valor_by_trimestre.csv')
 
 
 #------------------------------------------------- Teste 3
-from sql_server import SqlServer
+from src.sql_server import SqlServer
 
 file_sql = 'despesas_agregadas.sql'
 if os.path.exists(file_sql):
