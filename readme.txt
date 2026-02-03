@@ -421,7 +421,7 @@ Python 3.9+
 pip
 Acesso à internet (para download dos dados da ANS)
 2️⃣ Clonar o repositório
-git clone <url-do-repositorio>
+git clone https://github.com/SanukDev/project_Intuitive_Care_Healthtech_de_SaaS_Vertical
 cd project
 3️⃣ Criar e ativar ambiente virtual (opcional, recomendado)
 python -m venv venv
