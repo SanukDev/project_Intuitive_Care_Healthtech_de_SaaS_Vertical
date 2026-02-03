@@ -1,36 +1,62 @@
 📊 Pipeline de Análise de Despesas das Operadoras de Saúde – ANS
 
+
 📌 Visão Geral
 
-Este projeto implementa um pipeline completo de dados para coleta, processamento e preparação de informações públicas disponibilizadas pela ANS (Agência Nacional de Saúde Suplementar).
-O objetivo principal é:
-Automatizar o download de arquivos disponibilizados via web (API aberta / repositório público)
+Este projeto implementa um pipeline completo de dados, desde a coleta até a exposição das informações, utilizando dados públicos disponibilizados pela ANS (Agência Nacional de Saúde Suplementar).
+O objetivo principal do projeto é:
+Automatizar o download de arquivos disponibilizados via web (API aberta / repositório público da ANS)
 Realizar o processamento de arquivos CSV compactados (.zip)
 Tratar grandes volumes de dados utilizando processamento em chunks
+Consolidar e enriquecer dados financeiros e cadastrais das operadoras
 Gerar automaticamente scripts SQL compatíveis com MySQL, incluindo:
 Criação de tabelas
 Inserção de dados
-O projeto foi desenvolvido com foco em clareza, reprodutibilidade e escalabilidade, adotando boas práticas de engenharia de dados.
-2. Arquitetura Geral
-O pipeline é dividido em três camadas principais, cada uma representada por uma classe:
-ApiCollect  →  DataProcess  →  SqlServer
-(Coleta)        (Tratamento)     (Persistência)
-Cada classe possui responsabilidades bem definidas, seguindo o princípio de Single Responsibility.
-3. Estrutura do Projeto
+Expor os dados consolidados por meio de uma API REST, permitindo:
+Consulta de operadoras
+Consulta de despesas por operadora
+Acesso a estatísticas agregadas
+Disponibilizar uma interface web simples para visualização dos dados e gráficos
+O projeto foi desenvolvido com foco em clareza, reprodutibilidade e escalabilidade, adotando boas práticas de engenharia de dados e desenvolvimento backend.
+
+
+🏗️ Arquitetura Geral
+O pipeline é dividido em quatro camadas principais, cada uma com responsabilidades bem definidas:
+
+ApiCollect  →  DataProcess  →  SqlServer  →  API Flask + Frontend
+(Coleta)       (Tratamento)     (Persistência)   (Exposição)
+
+
+Cada camada segue o princípio de Single Responsibility, facilitando manutenção, testes e evolução do sistema.
+📁 Estrutura do Projeto
+
 project/
 │
-├── downloads/              # Arquivos baixados da ANS
-│   └── extracted/          # Arquivos extraídos dos .zip
+├── downloads/                  # Arquivos brutos baixados da ANS
+│   └── extracted/              # Arquivos extraídos dos .zip
 │
-├── sql/
-│   └── output.sql          # Script SQL gerado automaticamente
+├── final_data/                 # Dados tratados e consolidados
+│   ├── despesas_agregadas.csv
+│   └── *.zip
+│
+├── despesas_agregadas.sql      # Script SQL gerado automaticamente
+│
 │
 ├── src/
-│   ├── api_collect.py      # Classe ApiCollect
-│   ├── data_process.py     # Classe DataProcess
-│   └── sql_server.py       # Classe SqlServer
+│   ├── api_collect.py          # Classe ApiCollect (coleta de dados)
+│   ├── data_process.py         # Classe DataProcess (tratamento de dados)
+│   └── sql_server.py           # Classe SqlServer (geração de SQL)
 │
-└── main.py                 # Arquivo principal de execução
+├── server_api.py               # API Flask (exposição dos dados)
+│
+│
+├── templates/
+│   └── index.html              # Interface Web (Vue.js + Chart.js)
+│
+└── main.py
+
+
+
 4. Classe ApiCollect
 Responsabilidade
 A classe ApiCollect é responsável pela coleta dos dados brutos diretamente da fonte pública da ANS.
@@ -56,6 +82,8 @@ list[str]: Lista com os nomes dos arquivos baixados
 Observações Técnicas
 Utiliza stream=True para evitar sobrecarga de memória
 O uso de web scraping permite adaptação caso novos arquivos sejam adicionados futuramente
+
+
 5. Classe DataProcess
 Responsabilidade
 A classe DataProcess cuida da transformação e preparação dos dados, atuando como a camada de processamento do pipeline.
@@ -80,6 +108,8 @@ to_zip(file_name, name_zip="compacted", folder="")
 Descrição
 Compacta arquivos processados em um novo .zip
 Útil para versionamento ou transporte de dados tratados
+
+
 6. Classe SqlServer
 Responsabilidade
 A classe SqlServer é responsável por converter DataFrames em scripts SQL, sem depender de ORM ou conexão direta com o banco.
@@ -120,6 +150,8 @@ Escreve cada linha do DataFrame como uma instrução SQL
 Trade-off
 Inserções linha a linha priorizam clareza e rastreabilidade
 Para grandes volumes, recomenda-se bulk insert
+
+
 7. Como Executar o Projeto
 Pré-requisitos
 Python 3.9+
@@ -134,17 +166,23 @@ Baixar os arquivos
 Extrair os dados
 Processar os CSVs
 Gerar o arquivo SQL final
+
+
 8. Decisões Técnicas e Trade-offs
 Não utilização de ORM para manter transparência do SQL
 Geração de scripts ao invés de conexão direta com banco
 Chunking para eficiência de memória
 Tipagem automática baseada em inferência pandas
+
+
 9. Possíveis Melhorias Futuras
 Inserção em lote (bulk insert)
 Validação de schema
 Paralelização do processamento
 Integração com Airflow
 Dashboard analítico (Power BI / Tableau)
+
+
 10. Conclusão
 Este projeto demonstra um pipeline de dados completo, com separação clara de responsabilidades, foco em dados reais e preocupação com escalabilidade e legibilidade — características essenciais em projetos profissionais de engenharia e análise de dados.
 
@@ -201,6 +239,8 @@ Finalidade
 Serve a página inicial da aplicação
 Pode ser integrada com um frontend (HTML, Vue, React)
 Endpoints da API
+
+
 1️⃣ GET /api/operadoras
 @app.route("/GET/api/operadoras", methods=["GET"])
 def listar_operadoras():
@@ -224,6 +264,8 @@ Justificativa
 Implementa paginação manual
 Evita retorno excessivo de dados
 Boa prática para APIs reais
+
+
 2️⃣ GET /api/operadoras/{cnpj}
 @app.route("/GET/api/operadoras/<cnpj>", methods=["GET"])
 def operadora_detalhe(cnpj):
@@ -237,6 +279,8 @@ if operadora.empty:
 Resposta
 JSON com os dados completos da operadora
 HTTP 404 se não encontrada
+
+
 3️⃣ GET /api/operadoras/{cnpj}/despesas
 @app.route("/GET/api/operadoras/<cnpj>/despesas", methods=["GET"])
 def despesas_operadora(cnpj):
@@ -253,6 +297,8 @@ Resposta JSON
 Valor Analítico
 Permite análises financeiras por operadora
 Endpoint fundamental para dashboards
+
+
 4️⃣ GET /api/estatisticas
 @app.route("/GET/api/estatisticas", methods=["GET"])
 def estatisticas():
@@ -293,6 +339,8 @@ Finalidade
 Vue.js: gerenciamento de estado, eventos e renderização dinâmica
 Chart.js: geração de gráficos estatísticos (despesas por UF)
 Funcionalidades Implementadas
+
+
 1️⃣ Listagem de Operadoras
 Consome o endpoint:
 GET /api/operadoras
@@ -302,6 +350,8 @@ CNPJ
 Botão para consulta de despesas
 <li v-for="op in operadoras" :key="op.CNPJ">
 Utiliza renderização reativa com v-for.
+
+
 2️⃣ Consulta de Despesas por Operadora
 Acionada ao clicar no botão Despesas
 Consome o endpoint:
@@ -310,6 +360,8 @@ GET /api/operadoras/{cnpj}/despesas
 Exibe:
 Trimestre
 Valor das despesas formatado em reais
+
+
 3️⃣ Gráfico de Despesas por UF
 Gerado automaticamente ao carregar a página
 Consome o endpoint:
