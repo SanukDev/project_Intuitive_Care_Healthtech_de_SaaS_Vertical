@@ -1,4 +1,4 @@
-from api_server import ApiCollect
+from api_collect import ApiCollect
 from pathlib import Path
 import pandas as pd
 import os

@@ -1,4 +1,4 @@
-from api_server import ApiCollect
+from api_collect import ApiCollect
 from data_process import DataProcess
 import pandas as pd
 
