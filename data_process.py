@@ -1,9 +1,7 @@
-
 import pandas as pd
 from zipfile import ZipFile
 
 class DataProcess:
-
 
     # Trade-off tecnico
     def chunking_func(self,file):
