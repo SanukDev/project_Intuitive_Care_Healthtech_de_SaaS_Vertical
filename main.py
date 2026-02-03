@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from data_process import DataProcess
 
+
 URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
 
 data_collect = ApiCollect(url=URL)
@@ -78,9 +79,12 @@ except:
 
 print(df_consolidado.shape)
 df_consolidado['DATA'] = pd.to_datetime(df_consolidado['DATA'])
+df_consolidado['VL_SALDO_INICIAL'] = df_consolidado['VL_SALDO_INICIAL'].astype(str).str.replace(',', '.').astype(float)
+df_consolidado['VL_SALDO_FINAL'] = df_consolidado['VL_SALDO_FINAL'].astype(str).str.replace(',', '.').astype(float)
 print(df_consolidado['DESCRICAO'].head())
 print('\n')
 print(df_consolidado['CD_CONTA_CONTABIL'].duplicated().sum())
+
 
 print(df_consolidado.describe())
 print(df_consolidado.info())
@@ -99,20 +103,21 @@ except FileExistsError:
 
 
 data_collect_t2 = ApiCollect(url='https://dadosabertos.ans.gov.br/FTP/PDA/operadoras_de_plano_de_saude_ativas/')
-data_proc_t2 = DataProcess()
 try:
-    df_relatorio = data_proc_t2.chunking_func(file='downloads/Relatorio_cadop.csv')
+    df_relatorio = data_proc.chunking_func(file='downloads/Relatorio_cadop.csv')
 except:
     data_collect_t2.download_file_zip()
-    df_relatorio = data_proc_t2.chunking_func(file='downloads/Relatorio_cadop.csv')
+    df_relatorio = data_proc.chunking_func(file='downloads/Relatorio_cadop.csv')
 
 df_conso = data_proc.chunking_func(file=f'{folder_final_data}/consolidado_despesas.csv')
+
+#-------------------------- start data verification df_relatorio
 print('Verification Relatorio cadop\n')
 print('The size of data frame Relatorio cadop: ')
 print(df_relatorio.shape)
 
 # start data verification
-print('\nInformation of data frame: \n')
+print('\nInformation of data frame: df_relatorio\n')
 print(df_relatorio.info())
 
 print(f'\nThere are NaN values? ')
@@ -121,12 +126,25 @@ print(df_relatorio.isna().sum())
 print(f'\nThere are duplicated values? {df_relatorio.duplicated().sum()}\n')
 # df_relatorio = df_relatorio.dropna()
 # the most important data are correct and complete therefore I will keep the NaN values
+#-------------------------resolving data df_relatorio
+df_relatorio['CEP'] = df_relatorio['CEP'].to_string()
+df_relatorio['DDD'] = df_relatorio['DDD'].to_string()
+df_relatorio['Telefone'] = df_relatorio['Telefone'].to_string()
+df_relatorio['Fax'] = df_relatorio['Fax'].to_string()
+df_relatorio['CNPJ'] = df_relatorio['CNPJ'].to_string()
+df_relatorio['Regiao_de_Comercializacao'] = df_relatorio['Regiao_de_Comercializacao'].to_numpy(int)
+df_relatorio['Data_Registro_ANS'] = pd.to_datetime(df_relatorio['Data_Registro_ANS'])
+print('\nInformation of data frame: df_relatorio after solving data\n')
+print(df_relatorio.info())
+
+# ----------------------start data verification df_conso
+
 print('Verification dataFrame Consolidado despesas \n')
 print('The size of data frame Consolidado despesas: ')
 print(df_conso.shape)
 
-# start data verification
-print('\nInformation of data frame: \n')
+
+print('\nInformation of data frame: df_conso\n')
 print(df_conso.info())
 
 print(f'\nThere are NaN values? \n')
@@ -145,9 +163,9 @@ print(df_final.isna().sum())
 #-------------------- Clean duplicated data in the Dataframe
 #df_final = df_final.drop(df_final[df_final['CNPJ'].duplicated()].index)
 print("\n\nvalores duplicados")
-print(df_final[['DATA','CNPJ', 'Razao_Social','VL_SALDO_INICIAL', 'VL_SALDO_FINAL','Modalidade','Nome_Fantasia']].duplicated().value_counts())
+print(df_final[['DATA','CNPJ', 'Razao_Social','VL_SALDO_INICIAL', 'VL_SALDO_FINAL','Modalidade','Nome_Fantasia','Representante']].duplicated().value_counts())
 print(df_final.shape)
-df_final = df_final.drop(df_final[df_final[['DATA','CNPJ', 'Razao_Social','VL_SALDO_INICIAL', 'VL_SALDO_FINAL','Modalidade','Nome_Fantasia']].duplicated()].index)
+df_final = df_final.drop(df_final[df_final[['DATA','CNPJ', 'Razao_Social','VL_SALDO_INICIAL', 'VL_SALDO_FINAL','Modalidade','Nome_Fantasia','Representante']].duplicated()].index)
 print('\n\nShape after drop duplicated values')
 print(df_final.shape)
 
@@ -160,16 +178,18 @@ print(df_final['VL_SALDO_INICIAL'].head(50))
 # Creating new final dataframe with values correct
 
 df_despesas = pd.DataFrame()
-df_despesas['CNPJ'] = df_final['CNPJ']
+df_despesas['CNPJ'] = str(df_final['CNPJ'])
 df_despesas['RazaoSocial'] = df_final['Razao_Social']
-df_despesas['Trimestre'] = df_final['DATA']
-df_despesas['Ano'] = df_final['Data_Registro_ANS']
+df_despesas['Trimestre'] = pd.to_datetime(df_final['DATA'])
+df_despesas['Ano'] = pd.to_datetime(df_final['Data_Registro_ANS'])
 df_despesas['ValorDespesas'] = df_final['VL_SALDO_FINAL'] - df_final['VL_SALDO_INICIAL']
-df_despesas['RegistroANS'] = df_final['REG_ANS']
+df_despesas['RegistroANS'] = df_final['REG_ANS'].to_numpy(int)
 df_despesas['Modalidade'] = df_final['Modalidade']
 df_despesas['UF'] = df_final['UF']
 print(df_despesas[['RazaoSocial', 'ValorDespesas']].head())
-
+# Info despesas
+print("\n\nData information df_despesas ")
+print(df_despesas.info())
 
 # Sort values by 'RazaoSocial' and 'UF
 df_despesas.sort_values(['RazaoSocial', 'UF'], ascending=True, inplace=True)
@@ -178,18 +198,29 @@ print(df_despesas[['RazaoSocial', 'UF']].head(50))
 
 # Creating file -------------- DESPESAS AGREGADAS
 df_despesas.to_csv(f'{folder_final_data}/despesas_agregadas.csv')
-#-------------------------------Calculating values
+data_proc.to_zip(file_name=f'{folder_final_data}/despesas_agregadas.csv',name_zip='Teste_Samuel_Melo',folder=folder_final_data)
 
+
+#----------------------------------Calculating values
+
+#--------------------------
 # Calc ValorDespesas by UF
 df_valor_by_uf = df_despesas[['ValorDespesas','UF']].groupby('UF').sum(numeric_only=True)
-# Calc ValorDespesas by Trimestre
-df_valor_by_trimestre = df_despesas[['ValorDespesas','Trimestre']].groupby('Trimestre').sum()
 
 print('\n\nValues by UF: ')
 print(df_valor_by_uf.sort_values('ValorDespesas', ascending=False))
 df_valor_by_uf = df_valor_by_uf.sort_values('ValorDespesas', ascending=False)
+#Creating the final files
 df_valor_by_uf.to_csv(f'{folder_final_data}/valor_by_uf.csv')
+
+#------------------------
+# Calc ValorDespesas by Trimestre
+df_valor_by_trimestre = df_despesas[['ValorDespesas','Trimestre']].groupby('Trimestre').sum()
+
 print('\n\nValues by Trimestre: ')
 print(df_valor_by_trimestre.sort_values('ValorDespesas', ascending=False))
 df_valor_by_trimestre = df_valor_by_trimestre.sort_values('ValorDespesas', ascending=False)
+#Creating the final files
 df_valor_by_trimestre.to_csv(f'{folder_final_data}/valor_by_trimestre.csv')
+
+
