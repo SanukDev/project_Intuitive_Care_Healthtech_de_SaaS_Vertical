@@ -411,3 +411,40 @@ Demonstra integração completa entre:
 ETL (Pandas)
 Backend (Flask)
 Frontend (Vue.js + Chart.js)
+
+
+
+▶️ Roteiro para Executar a Aplicação
+1️⃣ Pré-requisitos
+Certifique-se de ter instalado:
+Python 3.9+
+pip
+Acesso à internet (para download dos dados da ANS)
+2️⃣ Clonar o repositório
+git clone <url-do-repositorio>
+cd project
+3️⃣ Criar e ativar ambiente virtual (opcional, recomendado)
+python -m venv venv
+source venv/bin/activate   # Linux / Mac
+venv\Scripts\activate      # Windows
+4️⃣ Instalar as dependências
+pip install -r requirements.txt
+(ou instalar manualmente: pandas, requests, beautifulsoup4, flask, flask-cors)
+5️⃣ Executar o pipeline de dados (ETL)
+python main.py
+Essa etapa irá:
+baixar os dados da ANS
+processar e consolidar os arquivos
+gerar os CSVs finais
+criar o script SQL automaticamente
+6️⃣ Executar a API Flask
+python server_api.py
+A API ficará disponível em:
+http://127.0.0.1:5000
+7️⃣ Acessar a aplicação web
+Abra o navegador e acesse:
+http://127.0.0.1:5000/
+A interface irá:
+listar operadoras
+permitir consulta de despesas
+exibir gráficos estatísticos por UF
