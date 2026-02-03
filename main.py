@@ -1,6 +1,7 @@
 from api_server import ApiCollect
 from pathlib import Path
 import pandas as pd
+import os
 from data_process import DataProcess
 
 URL = "https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/2025/"
@@ -37,6 +38,7 @@ site = Path('downloads/extracted/')
 dfs_list = []
 file_end_name = "consolidado_despesas.csv"
 df_consolidado = []
+folder_final_data = 'final_data'
 # To try open the file consolidado_despesas.csv, but case not exist jump it to the routine to create it
 try:
     df_consolidado = data_proc.chunking_func(file=file_end_name)
@@ -83,8 +85,9 @@ print(df_consolidado['CD_CONTA_CONTABIL'].duplicated().sum())
 print(df_consolidado.describe())
 print(df_consolidado.info())
 try:
-    df_consolidado.to_csv(file_end_name, mode='x' )
-    data_proc.to_zip(file_name=file_end_name, name_zip='consolidado_despesas')
+    os.makedirs(folder_final_data, exist_ok=True)
+    df_consolidado.to_csv(f'{folder_final_data}/{file_end_name}', mode='x' )
+    data_proc.to_zip(file_name=f'{folder_final_data}/{file_end_name}', name_zip='consolidado_despesas', folder=folder_final_data)
 except FileExistsError:
    print("\nThe file already exist...\n")
 

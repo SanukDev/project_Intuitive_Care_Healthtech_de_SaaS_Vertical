@@ -17,8 +17,8 @@ class DataProcess:
         df = pd.concat(chunks)
         return df
 
-    def to_zip(self,file_name, name_zip='compacted'):
-        with ZipFile(f'{name_zip}.zip', 'w') as my_zip:
+    def to_zip(self,file_name, name_zip='compacted', folder=''):
+        with ZipFile(f'{folder}/{name_zip}.zip', 'w') as my_zip:
             my_zip.write(f'{file_name}')
 
     # 1.2. Processamento de Arquivos

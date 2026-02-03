@@ -84,8 +84,13 @@ print(df_despesas[['RazaoSocial', 'UF']].head(50))
 #-------------------------------Calculating values
 
 # Calc ValorDespesas by UF
-print(df_despesas[['ValorDespesas','UF']].groupby('UF').sum(numeric_only=True))
+df_valor_by_uf = df_despesas[['ValorDespesas','UF']].groupby('UF').sum(numeric_only=True)
 # Calc ValorDespesas by Trimestre
-print(df_despesas[['ValorDespesas','Trimestre']].groupby('Trimestre').sum())
+df_valor_by_trimestre = df_despesas[['ValorDespesas','Trimestre']].groupby('Trimestre').sum()
+
+print('\n\nValues by UF: ')
+print(df_valor_by_uf.sort_values('ValorDespesas', ascending=False))
+print('\n\nValues by Trimestre: ')
+print(df_valor_by_trimestre.sort_values('ValorDespesas', ascending=False))
 
 
