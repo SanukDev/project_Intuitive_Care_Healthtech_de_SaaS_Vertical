@@ -3,19 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Operadoras ANS</title>
+
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 </head>
 <body>
 
 <div id="app">
   <h1>Operadoras de Saúde</h1>
 
-  <button @click="carregarOperadoras">Carregar Operadoras</button>
+  <a href="http://127.0.0.1:5000/GET/api/operadoras">CARREGAR OPERADORA</a>
+  <p></p>
+  <a href="http://127.0.0.1:5000/GET/api/estatisticas">CARREGAR ESTATISTICAS</a>
+
+  <h2>Distribuição de Despesas por UF</h2>
+  <canvas id="graficoUF"></canvas>
 
   <ul>
     <li v-for="op in operadoras" :key="op.CNPJ">
-      <strong>{{ op.Razao_Social }}</strong>
-      ({{ op.CNPJ }})
+      <strong>[[ op.Razao_Social ]]</strong>
+      ([[ op.CNPJ ]])
       <button @click="verDespesas(op.CNPJ)">Despesas</button>
     </li>
   </ul>
@@ -25,7 +32,7 @@
   <h2 v-if="despesas.length">Despesas da Operadora</h2>
   <ul>
     <li v-for="d in despesas" :key="d.Trimestre">
-      {{ d.Trimestre }} - R$ {{ d.ValorDespesas.toFixed(2) }}
+      [[ d.Trimestre ]] - R$ [[ d.ValorDespesas.toFixed(2) ]]
     </li>
   </ul>
 </div>
@@ -34,28 +41,69 @@
 const { createApp } = Vue
 
 createApp({
+  delimiters: ['[[', ']]'],
+
   data() {
     return {
       operadoras: [],
       despesas: [],
       page: 1,
-      limit: 5
+      limit: 10,
+      chart: null
     }
   },
+
+  mounted() {
+    this.carregarGraficoUF()
+  },
+
   methods: {
     async carregarOperadoras() {
       const res = await fetch(
-        `http://127.0.0.1:5000/api/operadoras?page=${this.page}&limit=${this.limit}`
+        `http://127.0.0.1:5000/GET/api/operadoras?page=${this.page}&limit=${this.limit}`
       )
       const data = await res.json()
       this.operadoras = data.data
     },
+
     async verDespesas(cnpj) {
       const res = await fetch(
-        `http://127.0.0.1:5000/api/operadoras/${cnpj}/despesas`
+        `http://127.0.0.1:5000/GET/api/operadoras/${cnpj}/despesas`
       )
       const data = await res.json()
       this.despesas = data.data
+    },
+
+    async carregarGraficoUF() {
+      const response = await fetch("http://127.0.0.1:5000/GET/api/estatisticas")
+      if (!response.ok) return
+
+      const data = await response.json()
+      const despesasUF = data.despesas_por_uf
+
+      const labels = Object.keys(despesasUF)
+      const valores = Object.values(despesasUF).map(Number)
+
+      const ctx = document.getElementById("graficoUF").getContext("2d")
+
+      if (this.chart) this.chart.destroy()
+
+      this.chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [{
+            label: "Despesas por UF (R$)",
+            data: valores
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      })
     }
   }
 }).mount("#app")

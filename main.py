@@ -44,9 +44,9 @@ folder_final_data = 'final_data'
 try:
     df_consolidado = data_proc.chunking_func(file=f'{folder_final_data}/{file_end_name}')
 
-except:
+except Exception as e:
+    print(e)
     # 1.2. Processamento de Arquivos
-    trimestre =  1
     for file in site.iterdir():
         print(f'Processing the file: {file}...\n')
         # -------------------------------- CHUNKING-----------------------------------
@@ -232,8 +232,11 @@ df_valor_by_trimestre.to_csv(f'{folder_final_data}/valor_by_trimestre.csv')
 #------------------------------------------------- Teste 3
 from sql_server import SqlServer
 
+file_sql = 'despesas_agregadas.sql'
+if os.path.exists(file_sql):
+    os.remove(file_sql)
 # Creating tables
-sql = SqlServer(file_name='despesas_agregadas.sql')
+sql = SqlServer(file_name=file_sql)
 #df_despesas
 df_despesas = df_despesas.fillna('NULL')
 sql.create_table(df_new = df_despesas, table_name='despesasconsolidadas')
@@ -245,5 +248,4 @@ sql.create_table(df_new=df_relatorio, table_name='relatoriocadop')
 #df_consolidado
 df_consolidado = df_consolidado.fillna('NULL')
 sql.create_table(df_new=df_consolidado, table_name='consolidadodespesas')
-
 
