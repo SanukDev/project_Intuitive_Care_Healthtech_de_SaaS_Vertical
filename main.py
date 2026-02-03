@@ -170,8 +170,8 @@ print('\n\nShape after drop duplicated values')
 print(df_final.shape)
 
 # -------------
-df_final['VL_SALDO_INICIAL'] = df_final['VL_SALDO_INICIAL'].str.replace(',', '.').astype(float)
-df_final['VL_SALDO_FINAL'] = df_final['VL_SALDO_FINAL'].str.replace(',', '.').astype(float)
+# df_final['VL_SALDO_INICIAL'] = df_final['VL_SALDO_INICIAL'].str.replace(',', '.').astype(float)
+# df_final['VL_SALDO_FINAL'] = df_final['VL_SALDO_FINAL'].str.replace(',', '.').astype(float)
 print(df_final['VL_SALDO_INICIAL'].head(50))
 
 
@@ -224,3 +224,16 @@ df_valor_by_trimestre = df_valor_by_trimestre.sort_values('ValorDespesas', ascen
 df_valor_by_trimestre.to_csv(f'{folder_final_data}/valor_by_trimestre.csv')
 
 
+#------------------------------------------------- Teste 3
+from sql_server import SqlServer
+
+# Creating tables
+sql = SqlServer(file_name='despesas_agregadas.sql')
+#df_despesas
+sql.create_table(df_new = df_despesas, table_name='despesasconsolidadas')
+
+#df_relatorio
+sql.create_table(df_new=df_relatorio, table_name='relatoriocadop')
+
+#df_consolidado
+sql.create_table(df_new=df_consolidado, table_name='consolidadodespesas')

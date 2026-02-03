@@ -4,8 +4,9 @@ import pandas as pd
 
 
 class SqlServer:
-    def __init__(self):
+    def __init__(self,file_name):
         # Types of dat
+        self.file_name = file_name
         self.VARCHAR = 'VARCHAR(250)'
         self.FLOAT = 'FLOAT'
 
@@ -44,7 +45,7 @@ class SqlServer:
         print(list_title)
 
         # Creating the table
-        with open('starlink.sql', 'a') as file:
+        with open(self.file_name, 'a') as file:
             # Writing CREATE TABLE in SQL file
             file.write(f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}(\n id INT AUTO_INCREMENT PRIMARY KEY")
             # Creating the title of rows in table
@@ -56,3 +57,9 @@ class SqlServer:
                 file.write(f',\n{list_title[index]} {sql_type}')
 
             file.write(');\n\n')
+
+df_teste = pd.read_csv("final_data/consolidado_despesas.csv")
+print(df_teste.loc[1])
+
+# for item in range(len(df_teste)):
+#     print(df_teste.loc[item])
