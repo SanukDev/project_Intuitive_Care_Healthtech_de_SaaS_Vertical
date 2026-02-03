@@ -47,19 +47,39 @@ class SqlServer:
         # Creating the table
         with open(self.file_name, 'a') as file:
             # Writing CREATE TABLE in SQL file
-            file.write(f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}(\n id INT AUTO_INCREMENT PRIMARY KEY")
+            file.write(f"CREATE TABLE IF NOT EXISTS {TABLE_NAME}( ")
             # Creating the title of rows in table
             for index in range(len(list_original_title)):
                 print(list_title[index])
                 # Check the type data and writing the row of TABLE
                 col = df_new[list_original_title[index]]
                 sql_type = self.infer_sql_type(col)
-                file.write(f',\n{list_title[index]} {sql_type}')
+                if index == 0:
+                    file.write(f'\n{list_title[index]} {sql_type}')
+                else:
+                    file.write(f',\n{list_title[index]} {sql_type}')
 
             file.write(');\n\n')
+        self.insert_values(df=df_new,table_name=table_name, list_titles=list_title)
 
-df_teste = pd.read_csv("final_data/consolidado_despesas.csv")
-print(df_teste.loc[1])
+    def insert_values(self,df,table_name,list_titles):
+        values_list = []
+        print('Inserting values...')
+        for j in range(len(df)):
+            for i in df.loc[j]:
+                # Checking the type of values
+                if type(i) == str:
+                    # Checkin if the value is NULL
+                    if i == "NULL":
+                        values_list.append(f"{i}")
+                    elif i == "" or i == 0:
+                        values_list.append("NULL")
+                    else:
+                        values_list.append(f"'{i}'")
+                else:
+                    values_list.append(f"{i}")
+            with open(self.file_name, 'a') as my_file:
+                my_file.write(f'INSERT INTO {table_name}({','.join(list_titles)}) VALUES({', '.join(values_list)});\n')
 
-# for item in range(len(df_teste)):
-#     print(df_teste.loc[item])
+            values_list = []
+        print("Insertion successfully")

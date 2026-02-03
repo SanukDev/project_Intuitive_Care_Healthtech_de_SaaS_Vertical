@@ -14,7 +14,7 @@ class DataProcess:
             # the "sep=" allows to choice a separator between ';', ',' and others, and engine='python', is bear that C language than python,
             # therefore this function allows other file extension like txt, cdv and xlsx
             chunks.append(chunk)
-        df = pd.concat(chunks)
+        df = pd.concat(chunks, ignore_index=True)
         return df
 
     def to_zip(self,file_name, name_zip='compacted', folder=''):
