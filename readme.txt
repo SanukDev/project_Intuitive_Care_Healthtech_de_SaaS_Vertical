@@ -1,3 +1,5 @@
+To access api documentation go https://samukakaroto-9147026.postman.co/workspace/Samuel-Melo's-Workspace~216a3775-038f-4a31-8e98-6a7112e9e72a/collection/47158791-24a8d493-77dd-4a8f-8cd2-6b21256c39ff?action=share&creator=47158791
+
 📊 Pipeline de Análise de Despesas das Operadoras de Saúde – ANS
 
 
