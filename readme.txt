@@ -478,3 +478,79 @@ A interface irá:
 listar operadoras
 permitir consulta de despesas
 exibir gráficos estatísticos por UF
+
+
+#------------------------------------------------------ Trade-OFF
+
+
+• Trade-off técnico: Decida entre processar todos os arquivos em memória de uma vez
+ou processar incrementalmente. Documente sua escolha e justifique considerando o
+volume de dados.
+
+R=
+Optei por processar os arquivos de forma incremental (chunking) ao invés de carregar todos os dados em memória
+de uma vez. Essa decisão foi motivada pelo grande volume de dados disponíveis na ANS, que poderia causar consumo
+excessivo de memória e travamentos. O chunking permite ler, filtrar e processar os dados em pedaços menores, garantindo
+que o pipeline seja escalável, eficiente e confiável mesmo para arquivos muito grandes
+
+Trade-off técnico: Para CNPJs inválidos, você precisará decidir como tratá-los.
+Considere diferentes estratégias e escolha a que fizer mais sentido. Escolha uma
+abordagem, implemente-a e documente no README sua escolha e os prós/contras
+considerados.
+
+R=
+Durante o processamento dos arquivos da ANS, foi observado que alguns registros continham dados inconsistentes.
+No entanto, os CNPJs estavam corretamente formatados, possivelmente porque se tratam de campos obrigatórios
+Outros dados inconsistentes ou ausentes: anulados ou preenchidos com valores nulos, utilizando o método .fillna().
+Essa estratégia evita que informações incorretas comprometam cálculos, agregações ou relatórios, sem excluir registros importantes.
+Justificativa da escolha:
+Essa abordagem equilibra manutenção da integridade dos dados com preservação da maior quantidade possível de registros úteis, garantindo
+que os merges e análises financeiras ocorram de forma correta, mesmo na presença de valores faltantes ou inconsistentes.
+
+
+Trade-off técnico: Para o join, você precisará decidir como processar os dados.
+Considere diferentes estratégias de processamento e escolha a que fizer mais sentido
+para o seu contexto. Documente sua escolha e justifique baseado no tamanho
+estimado dos dados e nas características do problema.
+
+R=
+Optei por carregar os dados já filtrados e consolidados em memória e fazer o join direto:
+Os arquivos já passaram pelo chunking e foram filtrados para conter apenas registros relevantes
+ ("Despesas com Eventos/Sinistros"), reduzindo bastante o volume de dados.
+O join é realizado apenas com dados úteis, o que evita sobrecarga de memória.
+Essa abordagem mantém código simples e legível, adequado para os volumes estimados de dados do projeto
+(milhares de linhas por trimestre, com centenas de operadoras).
+para o join foi usado o metodo .merge()
+
+
+• Trade-off técnico: Para ordenação, você precisará escolher uma estratégia
+considerando o volume de dados e os recursos disponíveis. Justifique sua escolha no
+README.
+
+R=
+O pandas nos permite usar várias ferramentas para tratar e filtrar os dados, como .groupby() e sort_values(), entre
+outras, além de .dropna() e .isna(), juntamente com diversas maneiras de converter valores.
+
+Trade-off técnico – Normalização:
+Opção A: Tabela desnormalizada com todos os dados
+Opção B: Tabelas normalizadas separadas
+
+R=
+Criei as tabelas e os inserts aproveitando os meus DataFrames já tratados, facilitando a coleta de dados posteriormente
+e, de certa forma, já armazenando os dados de forma normalizada.
+
+
+Trade-off técnico – Tipos de dados:
+Para valores monetários: DECIMAL vs FLOAT vs INTEGER (centavos)
+Para datas: DATE vs VARCHAR vs TIMESTAMP
+
+R=
+Para valores monetários, escolhi DECIMAL, pois assim posso normalizar os dados com mais facilidade e definir o número
+de casas decimais na criação da tabela. No caso de datas, preferi VARCHAR a DATETIME, pois não estou armazenando a data
+nem o horário exato; usar DATETIME geraria dados desnecessários.
+
+Trade-off técnico – Backend:
+Escolha do Framework:
+
+R=
+Escolhi Flask, pois já tinha familiaridade com o framework.
