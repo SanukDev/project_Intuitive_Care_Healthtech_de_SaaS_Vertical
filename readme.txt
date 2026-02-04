@@ -41,6 +41,10 @@ project_Intuitive_Care_Healthtech_de_SaaS_Vertical/
 │   ├── despesas_agregadas.csv
 │   └── *.zip
 │
+├── data/
+│   ├── querys.sql              # Query feita no banco apos a inserção de dados
+│   └── Teste_Samuel_Melo.zip   # Dados consolidados assim com foi requisitado
+│
 ├── despesas_agregadas.sql      # Script SQL gerado automaticamente
 │
 │
@@ -57,7 +61,8 @@ project_Intuitive_Care_Healthtech_de_SaaS_Vertical/
 │
 └── main.py
 
-## DIAGRAMA
+##------------ DIAGRAMA
+
 [ ANS ]
    ↓
 [ ApiCollect ]
@@ -69,6 +74,7 @@ project_Intuitive_Care_Healthtech_de_SaaS_Vertical/
 [ Flask API ]
    ↓
 [ Vue.js + Chart.js ]
+
 
 4. Classe ApiCollect
 Responsabilidade
