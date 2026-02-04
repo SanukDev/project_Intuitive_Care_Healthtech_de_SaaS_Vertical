@@ -32,7 +32,7 @@ ApiCollect  →  DataProcess  →  SqlServer  →  API Flask + Frontend
 Cada camada segue o princípio de Single Responsibility, facilitando manutenção, testes e evolução do sistema.
 📁 Estrutura do Projeto
 
-project/
+project_Intuitive_Care_Healthtech_de_SaaS_Vertical/
 │
 ├── downloads/                  # Arquivos brutos baixados da ANS
 │   └── extracted/              # Arquivos extraídos dos .zip
@@ -57,7 +57,18 @@ project/
 │
 └── main.py
 
-
+## DIAGRAMA
+[ ANS ]
+   ↓
+[ ApiCollect ]
+   ↓
+[ DataProcess ]
+   ↓
+[ CSV / SQL ]
+   ↓
+[ Flask API ]
+   ↓
+[ Vue.js + Chart.js ]
 
 4. Classe ApiCollect
 Responsabilidade
@@ -424,13 +435,24 @@ pip
 Acesso à internet (para download dos dados da ANS)
 2️⃣ Clonar o repositório
 git clone https://github.com/SanukDev/project_Intuitive_Care_Healthtech_de_SaaS_Vertical
-cd project
+cd 📄 requirements.txt contém:
+- pandas
+- requests
+- beautifulsoup4
+- flask
+- flask-cors
 3️⃣ Criar e ativar ambiente virtual (opcional, recomendado)
 python -m venv venv
 source venv/bin/activate   # Linux / Mac
 venv\Scripts\activate      # Windows
 4️⃣ Instalar as dependências
 pip install -r requirements.txt
+📄 requirements.txt contém:
+- pandas
+- requests
+- beautifulsoup4
+- flask
+- flask-cors
 (ou instalar manualmente: pandas, requests, beautifulsoup4, flask, flask-cors)
 5️⃣ Executar o pipeline de dados (ETL)
 python main.py
